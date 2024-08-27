@@ -1,0 +1,99 @@
+DROP DATABASE IF EXISTS nutri_hongo_db;
+CREATE DATABASE nutri_hongo_db;
+
+DROP TABLE IF EXISTS hongos;
+-- Crear tabla principal de hongos
+CREATE TABLE hongos (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    nombre TEXT NOT NULL,
+    nombre_cientifico TEXT,
+    descripcion TEXT
+);
+
+-- Insertar datos en la tabla de hongos
+INSERT INTO hongos (nombre, nombre_cientifico, descripcion) VALUES
+('Reishi', 'Ganoderma lucidum', 'Conocido por sus propiedades para fortalecer el sistema inmunológico.'),
+('Melena de León', 'Hericium erinaceus', 'Apoya la salud cognitiva y la regeneración nerviosa.'),
+('Cordyceps', 'Cordyceps militaris', 'Mejora la energía y el rendimiento atlético.'),
+('Cola de Pavo', 'Trametes versicolor', 'Promueve la salud intestinal y apoya el sistema inmunológico.'),
+('Gírgola Rosa', 'Pleurotus djamor', 'Conocido por su sabor delicado y su uso en la cocina gourmet.');
+
+DROP TABLE IF EXISTS origen_historia_hongos;
+-- Crear tabla para el origen y la historia de los hongos
+CREATE TABLE origen_historia_hongos (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    hongo_id BIGINT REFERENCES hongos(id),
+    origen TEXT,
+    historia TEXT
+);
+
+-- Insertar datos en la tabla de origen e historia
+INSERT INTO origen_historia_hongos (hongo_id, origen, historia) VALUES
+((SELECT id FROM hongos WHERE nombre = 'Reishi'), 'Asia', 'Usado en la medicina tradicional china por más de 2,000 años.'),
+((SELECT id FROM hongos WHERE nombre = 'Melena de León'), 'Norteamérica, Europa y Asia', 'Conocido por su uso en la medicina tradicional para la salud cognitiva.'),
+((SELECT id FROM hongos WHERE nombre = 'Cordyceps'), 'Regiones del Himalaya', 'Tradicionalmente usado por pastores tibetanos para mejorar la energía y vitalidad.'),
+((SELECT id FROM hongos WHERE nombre = 'Cola de Pavo'), 'En todo el mundo', 'Usado en varias culturas por sus propiedades para fortalecer el sistema inmunológico.'),
+((SELECT id FROM hongos WHERE nombre = 'Gírgola Rosa'), 'Regiones tropicales y subtropicales', 'Popular en la cocina asiática y conocida por su color vibrante y sabor único.');
+
+DROP TABLE IF EXISTS consumo_hongos;
+-- Crear tabla para el método de consumo
+CREATE TABLE consumo_hongos (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    hongo_id BIGINT REFERENCES hongos(id),
+    metodo_consumo TEXT
+);
+
+-- Insertar datos en la tabla de consumo
+INSERT INTO consumo_hongos (hongo_id, metodo_consumo) VALUES
+((SELECT id FROM hongos WHERE nombre = 'Reishi'), 'Tomar 1-2 cápsulas diarias con agua, preferiblemente con el estómago vacío.'),
+((SELECT id FROM hongos WHERE nombre = 'Melena de León'), 'Tomar 1 cápsula diaria con agua, preferiblemente por la mañana.'),
+((SELECT id FROM hongos WHERE nombre = 'Cordyceps'), 'Tomar 1-2 cápsulas diarias con agua, preferiblemente antes de hacer ejercicio.'),
+((SELECT id FROM hongos WHERE nombre = 'Cola de Pavo'), 'Tomar 1 cápsula diaria con agua, preferiblemente con una comida.'),
+((SELECT id FROM hongos WHERE nombre = 'Gírgola Rosa'), 'Se puede consumir salteado o en sopas, ideal para platos gourmet.');
+
+DROP TABLE IF EXISTS productos;
+-- Crear tabla de productos
+CREATE TABLE productos (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    hongo_id BIGINT REFERENCES hongos(id),
+    tipo_producto TEXT NOT NULL,
+    precio NUMERIC(10, 2),
+    stock INT
+);
+
+-- Insertar datos en la tabla de productos
+INSERT INTO productos (hongo_id, tipo_producto) VALUES
+((SELECT id FROM hongos WHERE nombre = 'Reishi'), 'Viales'),
+((SELECT id FROM hongos WHERE nombre = 'Reishi'), 'Granos miceliados'),
+((SELECT id FROM hongos WHERE nombre = 'Reishi'), 'Bolsas inoculadas'),
+((SELECT id FROM hongos WHERE nombre = 'Reishi'), 'Microdosis'),
+((SELECT id FROM hongos WHERE nombre = 'Reishi'), 'Hongo por kilo'),
+((SELECT id FROM hongos WHERE nombre = 'Melena de León'), 'Viales'),
+((SELECT id FROM hongos WHERE nombre = 'Melena de León'), 'Granos miceliados'),
+((SELECT id FROM hongos WHERE nombre = 'Melena de León'), 'Bolsas inoculadas'),
+((SELECT id FROM hongos WHERE nombre = 'Melena de León'), 'Microdosis'),
+((SELECT id FROM hongos WHERE nombre = 'Melena de León'), 'Hongo por kilo'),
+((SELECT id FROM hongos WHERE nombre = 'Cordyceps'), 'Viales'),
+((SELECT id FROM hongos WHERE nombre = 'Cordyceps'), 'Granos miceliados'),
+((SELECT id FROM hongos WHERE nombre = 'Cordyceps'), 'Bolsas inoculadas'),
+((SELECT id FROM hongos WHERE nombre = 'Cordyceps'), 'Microdosis'),
+((SELECT id FROM hongos WHERE nombre = 'Cordyceps'), 'Hongo por kilo'),
+((SELECT id FROM hongos WHERE nombre = 'Cola de Pavo'), 'Viales'),
+((SELECT id FROM hongos WHERE nombre = 'Cola de Pavo'), 'Granos miceliados'),
+((SELECT id FROM hongos WHERE nombre = 'Cola de Pavo'), 'Bolsas inoculadas'),
+((SELECT id FROM hongos WHERE nombre = 'Cola de Pavo'), 'Microdosis'),
+((SELECT id FROM hongos WHERE nombre = 'Cola de Pavo'), 'Hongo por kilo'),
+((SELECT id FROM hongos WHERE nombre = 'Gírgola Rosa'), 'Viales'),
+((SELECT id FROM hongos WHERE nombre = 'Gírgola Rosa'), 'Granos miceliados'),
+((SELECT id FROM hongos WHERE nombre = 'Gírgola Rosa'), 'Bolsas inoculadas'),
+((SELECT id FROM hongos WHERE nombre = 'Gírgola Rosa'), 'Microdosis'),
+((SELECT id FROM hongos WHERE nombre = 'Gírgola Rosa'), 'Hongo por kilo');
+
+DROP TABLE IF EXISTS carrito;
+-- Crear tabla para el carrito de compras
+CREATE TABLE carrito (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    producto_id BIGINT REFERENCES productos(id),
+    cantidad INT NOT NULL,
+    fecha_agregado TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
